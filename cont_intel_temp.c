@@ -13,7 +13,6 @@ typedef struct {
 Type_alerte ta = {0,0,0};
 
 
-
 typedef struct {
     float min;
     float max;
@@ -22,7 +21,7 @@ typedef struct {
 } Valeurs;
 Valeurs v = {1000.0, 0.0, 0.0, 0};
 
-// hedhi lfonction fi wist prog principale while
+
 void ValeursRapport(Valeurs *v, float temp) {
     if (temp > v->max) v->max = temp;
     if (temp < v->min) v->min = temp;
@@ -31,7 +30,6 @@ void ValeursRapport(Valeurs *v, float temp) {
 }
 
 
-//sami7
 #define FICHIER_CONFIG "config.txt"
 #define TAILLE_BUFFER 100
 
@@ -41,6 +39,7 @@ typedef struct{
     float seuil_max;
     int intervalle_mesure;
 } Configuration;
+
 
 void creerConfiguration(Configuration *config)
 {
@@ -102,14 +101,14 @@ void creerConfiguration(Configuration *config)
         valide = 1;
     }
 
-    // Creer et ecrire dans le fichier
+    
     FILE *fichier = fopen(FICHIER_CONFIG, "w");
     if (fichier == NULL){
         perror("Erreur lors de la creation du fichier de configuration");
         exit(1);
     }
 
-    // Ecrire les parametres dans le fichier
+    
     fprintf(fichier,"type_lieu=%s\n",config->type_lieu);
     fprintf(fichier,"seuil_min=%.2f\n",config->seuil_min);
     fprintf(fichier,"seuil_max=%.2f\n",config->seuil_max);
@@ -125,16 +124,13 @@ void creerConfiguration(Configuration *config)
     printf("  - Intervalle mesure  : %d secondes\n\n", config->intervalle_mesure);
 }
 
-//sami7
-
 float randombetween(float min,float max){
-    float a=rand()/(float)RAND_MAX; //0.0 to 1.0
+    float a=rand()/(float)RAND_MAX;
 
     return min+a*(max-min);
 }
 
 
-//esta3melt pointeur bech valeur matetresatech
 void write_log(FILE *f,const char *location,int intervalle_mesure,int i,float seuilmin,float seuilmax,Type_alerte *ta,int *c1,int *c2,int *c3){
 
     float valeur;
@@ -175,14 +171,12 @@ void write_log(FILE *f,const char *location,int intervalle_mesure,int i,float se
             break;
     }
     if (valeur >= seuilmin && valeur <= seuilmax) {
-        //printf("valeur capteur: %.2f\n",valeur);
         printf("Normal\n");
         (*c1)=0;
         (*c2)=0;
         (*c3)=0;
     }
     else if ((valeur < seuilmin && valeur >= (seuilmin - marge)) || (valeur > seuilmax && valeur <= (seuilmax + marge))) {
-        //printf("valeur capteur: %.2f\n",valeur);
         printf("Depassement leger: niveau 1\n"); 
         (*c1)++;
         (*c2)=0;
@@ -195,7 +189,6 @@ void write_log(FILE *f,const char *location,int intervalle_mesure,int i,float se
         (*c3)=0;
     }
     else {
-        //printf("valeur capteur: %.2f\n",valeur);
         printf("Depassement critique: niveau 3\n");
         (*c3)++;
         (*c1)=0;
@@ -213,8 +206,8 @@ void write_log(FILE *f,const char *location,int intervalle_mesure,int i,float se
         *c3=0;
     }
 
-    //printf("valeur capteur: %.2f\n",valeur);
-    time_t now=time(NULL);//taedh wa9t bel secont men 1970
+    
+    time_t now=time(NULL);
     struct tm *t=localtime(&now);
     fprintf(f,"mesure %d: %.2f   %02d-%02d-%04d %02d:%02d:%02d\n",i,valeur,t->tm_mday,t->tm_mon+1,t->tm_year+1900,t->tm_hour,t->tm_min,t->tm_sec);
     
@@ -223,12 +216,10 @@ void write_log(FILE *f,const char *location,int intervalle_mesure,int i,float se
 int main() {
 
 
-    srand(time(NULL));//donne des nb aleatoires diff
+    srand(time(NULL));
     Configuration config;
     creerConfiguration(&config);
     FILE *f1=fopen("config.txt","r");
-
-
 
     char etablissement[50];
     float seuilmax,seuilmin;
@@ -237,10 +228,8 @@ int main() {
     fscanf(f1,"seuil_min=%f\n",&seuilmin);
     fscanf(f1,"seuil_max=%f\n",&seuilmax);
     fscanf(f1,"intervalle_mesure=%d\n",&intervalle_mesure);
-    
     fclose(f1);
 
-    
     FILE *f=fopen("journal.txt","w");
     int i=1;
     int c1=0;
@@ -248,12 +237,10 @@ int main() {
     int c3=0;
     
     while(1){
-
         write_log(f,etablissement,intervalle_mesure,i,seuilmin,seuilmax,&ta,&c1,&c2,&c3);
         i++;
-
-        if(_kbhit()){ //tcapti chnaw nzelt 
-            char c=_getch(); //tchouf chnaw nzelt 3al clavier
+        if(_kbhit()){ 
+            char c=_getch(); 
             if(c=='q'){
                 printf("Arrêt demandé par l'utilisateur.\n");
                 printf("####################################\n");
@@ -275,15 +262,14 @@ int main() {
     fprintf(f2,"La Durée totale en état d'alerte est:%d seconde.\n",(ta.t_normale+ta.t_leger+ta.t_critique)*intervalle_mesure);
     fclose(f2);
 
-
-
     FILE *f3=fopen("rapport_journalier.txt","r");
 
     char ligne[256];
     while (fgets(ligne, sizeof(ligne), f3)) {
-        printf("%s", ligne);   // afficher chaque ligne
+        printf("%s", ligne);  
     }
 
     fclose(f3); 
     return 0;
+
 }
